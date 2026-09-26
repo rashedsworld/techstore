@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TechStore</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+
+  <nav class="bg-indigo-600 text-white px-8 py-4 flex justify-between items-center shadow-md">
+    <h1 class="text-2xl font-bold tracking-wide">⚡ TechStore</h1>
+    <div class="relative">
+      <span class="font-semibold">🛒 Cart: <span id="cart-count" class="bg-white text-indigo-600 px-2 py-1 rounded-full text-sm">0</span></span>
+    </div>
+  </nav>
+
+  <div class="max-w-6xl mx-auto py-10 px-4">
+    <h2 class="text-3xl font-bold text-gray-800 mb-8 text-center">Featured Products</h2>
+    <div id="product-grid" class="grid grid-cols-1 md:grid-cols-3 gap-8"></div>
+  </div>
+
+  <script>
+    let cartCount = 0;
+
+    async function loadProducts() {
+      try {
+        const response = await fetch('http://localhost:8000/api/products');
+        const products = await response.json();
+        
+        const grid = document.getElementById('product-grid');
+        grid.innerHTML = products.map(product => `
+          <div class="bg-white rounded-lg shadow-md overflow-hidden flex flex-col justify-between">
+            <img src="${product.image_url}" alt="${product.name}" class="w-full h-48 object-cover">
+            <div class="p-5 flex-1 flex flex-col justify-between">
+              <div>
+                <h3 class="text-xl font-bold text-gray-800 mb-2">${product.name}</h3>
+                <p class="text-gray-600 text-sm mb-4">${product.description}</p>
+              </div>
+              <div class="flex justify-between items-center mt-4">
+                <span class="text-2xl font-extrabold text-indigo-600">$${product.price.toFixed(2)}</span>
+                <button onclick="addToCart()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md font-medium transition">
+                  Add to Cart
+                </button>
+              </div>
+            </div>
+          </div>
+        `).join('');
+      } catch (err) {
+        console.error("Failed to fetch products:", err);
+      }
+    }
+
+    function addToCart() {
+      cartCount++;
+      document.getElementById('cart-count').innerText = cartCount;
+    }
+
+    loadProducts();
+  </script>
+</body>
+</html>
